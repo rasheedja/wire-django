@@ -1,0 +1,67 @@
+{% load static %}
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Welcome To Wire!</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'base/bootstrap/css/bootstrap.min.css'%}" />
+        <script type="text/javascript" src="{% static 'base/jquery/jquery-3.2.1.min.js'%}"></script>
+        <script type="text/javascript" src="{% static 'base/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Wire</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                        </li>
+                    </ul>
+                    <div class="my-2 my-lg-0">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Log In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Sign Up</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header class="jumbotron jumbotron-fluid bg-dark text-light">
+            <div class="container">
+                <h1 class="text-center">What's going on?</h1>
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h1>Latest Wires</h1>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    </div>
+                    <div class="col-sm-4">
+                        <h1>Popular Tags</h1>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p class="text-muted text-center">Think of a footer</p>
+            </div>
+        </footer>
+    </body>
+</html>
