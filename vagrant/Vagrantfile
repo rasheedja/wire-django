@@ -23,9 +23,10 @@ Vagrant.configure(2) do |config|
   "
 
   config.vm.provision "shell", name: "django", inline: "
+    apt-get update && apt-get -y upgrade
     apt-get -y install python3-pip
-    pip install --upgrade pip
-    pip install psycopg2
+    pip3 install --upgrade pip
+    pip3 install psycopg2
     pip3 install --upgrade pip
     pip3 install Django
   "
