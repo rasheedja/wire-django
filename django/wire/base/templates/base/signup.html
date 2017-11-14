@@ -1,0 +1,41 @@
+<html lang="en">
+    <head>
+        {% include 'base/global/head.html' %}
+        <title>Wire - Sign Up</title>
+    </head>
+    <body>
+        {% include 'base/global/header.html' %}
+        <main class="jumbotron">
+            <div class="container">
+                <div class="row">
+                    <h2 class="join-msg text-center col-sm-12">Join Wire Today</h2>
+                </div>
+                <div class="row">
+                    <form action="{% url 'base:register' %}" method="POST" class="col-sm-12 form-horizontal">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" name="username" placeholder="Username" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <input type="email" class="form-control" name="email" placeholder="Email" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <input type="password" class="form-control" name="password" placeholder="Password" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12 text-center">
+                            <button type="submit" class="btn btn-primary col-sm-12">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+        {% include 'base/global/footer.html' %}
+        {% include 'base/global/loadjs.html' %}
+    </body>
+</html>

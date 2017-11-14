@@ -15,13 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic import TemplateView
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='base/index.html')),
-    url(r'^base/', include('base.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^polls/', include('polls.urls')),
+    url(r'^', include('base.urls')),
 ]
 
 admin.site.site_header = 'Wire Administration'
