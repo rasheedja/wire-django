@@ -12,14 +12,31 @@
             </ul>
             <div class="my-2 my-lg-0">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'base:login' %}">Log In</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'base:signup' %}">Sign Up</a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">{{ user.username }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'base:logout' %}">Log Out</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'base:login' %}">Log In</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'base:signup' %}">Sign Up</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </div>
 </nav>
+<div class="container message-container">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible col-sm-12">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>

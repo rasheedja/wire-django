@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^signup$', TemplateView.as_view(template_name='base/signup.html'), name='signup'),
     url(r'^register$', views.register, name='register'),
     url(r'^verify&', views.verify_user, name='verify'),
+    url(r'^logout&', views.log_out, name='logout'),
 ]
