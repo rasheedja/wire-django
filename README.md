@@ -10,7 +10,7 @@ Install the vagrant-vbguest plugin `vagrant plugin install vagrant-vbguest`
 `cd vagrant` and `vagrant up`
 If this is your first `vagrant up`, go make a cup of tea. This will take a while
 Once the `vagrant up` has finished, `vagrant ssh` into your box
-`cd /django`
-`python3 manage.py 0:8000`
+`cd /django/wire`
+`python3 manage.py runserver`
 Now you should be able to access the site at `localhost:8080`
 

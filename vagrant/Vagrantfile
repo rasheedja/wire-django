@@ -16,6 +16,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "shell", name: "postgres", inline: "
+    apt-get update && apt-get -y upgrade
     apt-get -y install postgresql postgresql-9.5 postgresql-client postgresql-common libpq-dev
     sudo -u postgres bash -c \"psql -tc \\\"SELECT 1 FROM pg_roles WHERE rolname = 'wire'\\\" | grep -q 1 || psql -c \\\"CREATE USER wire WITH PASSWORD 'wire'\\\"\"
     sudo -u postgres bash -c \"psql -c \\\"ALTER USER wire CREATEDB\\\"\"
@@ -23,7 +24,6 @@ Vagrant.configure(2) do |config|
   "
 
   config.vm.provision "shell", name: "django", inline: "
-    apt-get update && apt-get -y upgrade
     apt-get -y install python3-pip
     pip3 install --upgrade pip
     pip3 install psycopg2
