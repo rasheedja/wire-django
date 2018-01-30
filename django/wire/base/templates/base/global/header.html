@@ -1,13 +1,24 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">Wire</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            {# Load urls, allowing you to dynamically set the active url in the navbar #}
+            {# See: https://stackoverflow.com/a/38808910 #}
+
+            {% url 'base:home' as home %}
+            {% url 'wire_profile:profile' as profile %}
+            {% url 'base:logout' as logout %}
+            {% url 'base:login' as login %}
+            {% url 'base:signup' as signup %}
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'base:home' %}">Home <span class="sr-only">(current)</span></a>
+                <li class="nav-item{% if request.path == home %} active{%endif%}">
+                    <a class="nav-link" href="{{ home }}">Home</a>
+                </li>
+                <li class="nav-item{% if request.path == profile %} active{%endif%}">
+                    <a class="nav-link" href="{{ profile }}">Profile</a>
                 </li>
             </ul>
             <div class="my-2 my-lg-0">
@@ -17,14 +28,14 @@
                             <a class="nav-link" href="#">{{ user.username }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'base:logout' %}">Log Out</a>
+                            <a class="nav-link" href="{{ logout }}">Log Out</a>
                         </li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'base:login' %}">Log In</a>
+                        <li class="nav-item{% if request.path == login %} active{%endif%}">
+                            <a class="nav-link" href="{{ login }}">Log In</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'base:signup' %}">Sign Up</a>
+                        <li class="nav-item{% if request.path == signup %} active{%endif%}">
+                            <a class="nav-link" href="{{ signup }}">Sign Up</a>
                         </li>
                     {% endif %}
                 </ul>
