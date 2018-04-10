@@ -1,3 +1,7 @@
 .message-container .alert {
     margin: 0.5rem 0;
 }
+
+nav.navbar {
+    margin: 0;
+}

@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'wire.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'wire',
+        'NAME': 'django_wire',
         'USER': 'wire',
         'PASSWORD': 'wire',
         'HOST': '127.0.0.1',
