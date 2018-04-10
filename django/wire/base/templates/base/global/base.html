@@ -1,0 +1,105 @@
+{% load static %}
+
+{# This is a the base html page. Other pages will populate the content block of this page #}
+{# See: https://docs.djangoproject.com/en/2.0/ref/templates/language/#template-inheritance #}
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" type="text/css" href="{% static 'base/bootstrap/css/bootstrap.min.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'base/global/css/custom.css' %}" />
+
+        <title>{%block title %}Welcome to Wire!{% endblock %}</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Wire</a>
+                    <button class="navbar-toggle collapse" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    {# Load urls, allowing you to dynamically set the active url in the navbar #}
+                    {# See: https://stackoverflow.com/a/38808910 #}
+
+                    {% url 'base:home' as home %}
+                    {% url 'wire_profile:profile' as profile %}
+                    {% url 'base:logout' as logout %}
+                    {% url 'base:login' as login %}
+                    {% url 'base:signup' as signup %}
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item{% if request.path == home %} active{%endif%}">
+                            <a href="{{ home }}">Home</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item{% if request.path == profile %} active{%endif%}">
+                                <a href="{{ profile }}">Profile</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a href="#">{{ user.username }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ logout }}">Log Out</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item{% if request.path == login %} active{%endif%}">
+                                <a href="{{ login }}">Log In</a>
+                            </li>
+                            <li class="nav-item{% if request.path == signup %} active{%endif%}">
+                                <a href="{{ signup }}">Sign Up</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {% load django_bootstrap_breadcrumbs %}
+
+        {% block breadcrumbs %}
+            {% clear_breadcrumbs %}
+            {% breadcrumb "Home" "base:home" %}
+        {% endblock %}
+
+        {% block crumbs %}
+            {% if request.path != home %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {% render_breadcrumbs "django_bootstrap_breadcrumbs/bootstrap3.html" %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        <div class="container message-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible col-sm-12">
+                    <a href="#" class="close" data-dismiss="alert">&times;</a>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        {% block content %}{% endblock %}
+
+        <footer>
+            <div class="container">
+                <p class="text-muted text-center">Think of a footer</p>
+            </div>
+        </footer>
+
+        <script type="text/javascript" src="{% static 'base/jquery/jquery-3.2.1.min.js'%}"></script>
+        <script type="text/javascript" src="{% static 'base/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+    </body>
+</html>

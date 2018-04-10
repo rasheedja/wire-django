@@ -1,79 +1,79 @@
-<html lang="en">
-    <head>
-        {% include 'base/global/head.html' %}
-        <title>Wire - Profile</title>
-    </head>
-    <body>
-    {% load bootstrap3 %}
-    {% include 'base/global/header.html' %}
-        <main>
-            {% if is_current_user %}
-                 <!-- The new wire modal -->
-                <div id="create-wire-modal" class="modal fade" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Create Wire</h4>
-                                <button class="close" type="button" data-dismiss="modal">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="create-wire-form" class="create-wire-form" role=form method=post action="{% url 'wire_profile:message' %}">
-                                    {% csrf_token %}
-                                    {% bootstrap_form form %}
-                                </form>
-                                <div class="modal-footer">
-                                    <button class="btn btn-default " type="button" data-dismiss="modal">Close</button>
-                                    <button class="btn btn-primary " type="submit" form="create-wire-form">Submit Wire</button>
-                                </div>
+{% extends "base/global/base.html" %}
+
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap3 %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Profile" "base:profile" %}
+{% endblock %}
+
+{% block content %}
+    <main>
+        {% if is_current_user %}
+             <!-- The new wire modal -->
+            <div id="create-wire-modal" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Create Wire</h4>
+                            <button class="close" type="button" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="create-wire-form" class="create-wire-form" role=form method=post action="{% url 'wire_profile:message' %}">
+                                {% csrf_token %}
+                                {% bootstrap_form form %}
+                            </form>
+                            <div class="modal-footer">
+                                <button class="btn btn-default " type="button" data-dismiss="modal">Close</button>
+                                <button class="btn btn-primary " type="submit" form="create-wire-form">Submit Wire</button>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endif %}
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-2 user-info">
-                        <h3>{{user.username}}'s Page</h3>
-                        {% if is_current_user %}
-                            <button class="btn btn-primary create-wire" type="button" data-toggle="modal" data-target="#create-wire-modal">New Wire</button>
-                        {% endif %}
-                    </div>
-                    <div class="col-sm-7 user-wires">
-                        <ul class="list-group">
+            </div>
+        {% endif %}
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2 user-info">
+                    <h3>{{user.username}}'s Page</h3>
+                    {% if is_current_user %}
+                        <button class="btn btn-primary create-wire" type="button" data-toggle="modal" data-target="#create-wire-modal">New Wire</button>
+                    {% endif %}
+                </div>
+                <div class="col-sm-7 user-wires">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <h3>Wires</h3>
+                        </li>
+                        {% if messages is None %}
                             <li class="list-group-item">
-                                <h3>Wires</h3>
+                                This user has not created any wires
                             </li>
-                            {% if messages is None %}
+                        {% else %}
+                            {% for message in user_messages %}
                                 <li class="list-group-item">
-                                    This user has not created any wires
+                                    {{ message.message_text }}
                                 </li>
-                            {% else %}
-                                {% for message in user_messages %}
-                                    <li class="list-group-item">
-                                        {{ message.message_text }}
-                                    </li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-                    </div>
-                    <div class="col-sm-3 wire-recommends">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <h3>Recommendations</h3>
-                            </li>
-                            <li class="list-group-item">
-                                <span>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-sm-3 wire-recommends">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <h3>Recommendations</h3>
+                        </li>
+                        <li class="list-group-item">
+                            <span>
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            </span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </main>
-        {% include 'base/global/footer.html' %}
-        {% include 'base/global/loadjs.html' %}
-    </body>
-</html>
+        </div>
+    </main>
+{% endblock %}

@@ -1,8 +1,9 @@
 from django.test import TestCase
+from django.test import TransactionTestCase
 from django.urls import reverse
 
 
-class RegisterViewTests(TestCase):
+class RegisterViewTests(TransactionTestCase):
     """
     Test the sign up view
     """

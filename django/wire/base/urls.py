@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 
 app_name = 'base'
 urlpatterns = [
-    # ex: /home/
+    # ex: /
     url(r'^$', TemplateView.as_view(template_name='base/index.html'), name='home'),
     # ex: /login/
     url(r'^login$', TemplateView.as_view(template_name='base/login.html'), name='login'),
