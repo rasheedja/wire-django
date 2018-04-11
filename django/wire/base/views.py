@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db import IntegrityError
+from django.db.models import ObjectDoesNotExist, FieldDoesNotExist
 from django.core.validators import validate_email
 from django.core.exceptions import  ValidationError
 
@@ -104,3 +105,25 @@ def log_out(request):
     logout(request)
     messages.success(request, 'You have logged out successfully')
     return HttpResponseRedirect(reverse('base:home'))
+
+def recommended_users(request, excluded_username):
+    """
+    Return five users that is not the logged in user, anyone followed by the logged in user, or the specified excluded
+    user
+
+    :param request: The request that called this function
+    :param excluded_username: A user not to include in the list
+    :return:
+    """
+    try:
+        if request.user.is_authenticated:
+            users = User.objects.filter().exclude(id=request.user.id).exclude(username=excluded_username)\
+                .values('username')
+            return JsonResponse(list(users), safe=False)
+
+        users = User.objects.filter().exclude(username=excluded_username).values('username')
+        return JsonResponse(list(users), safe=False)
+
+    except (ObjectDoesNotExist, FieldDoesNotExist):
+        messages.error(request, 'Error retrieving recommended users. Please Contact IT', extra_tags='danger')
+        return HttpResponseRedirect(reverse('base:home'))

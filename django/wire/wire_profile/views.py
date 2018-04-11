@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.template.loader import get_template
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db import DatabaseError
 from django.db.models import ObjectDoesNotExist, FieldDoesNotExist
+from django.core import serializers
 from .forms import NewWireForm
 from .models import Message
 
@@ -57,23 +58,6 @@ class ProfileView(TemplateView):
                 return HttpResponseRedirect(reverse('base:home'))
 
 
-
-def get_current_profile(request):
-    """
-    Get the current profile if the user is logged in. Show the search
-    page if the user is not logged in.
-
-    :param request: The current request
-    :return: Either redirect to the search page or render the profile page
-    """
-    if request.user.is_authenticated:
-        template = get_template('wire_profile/profile.html')
-        html = template.render({'user': request.user})
-        return HttpResponse(html)
-    else:
-        return HttpResponseRedirect(reverse('base:home'))
-
-
 def create_message(request):
     """
     Create a message for the logged in user
@@ -101,4 +85,22 @@ def create_message(request):
             return HttpResponseRedirect(reverse('base:home'))
     else:
         messages.error(request, 'Sorry, you cannot access that URL', extra_tags='danger')
+        return HttpResponseRedirect(reverse('base:home'))
+
+
+def get_messages(request, username):
+    """
+    Retrieve messages for the given username in JSON format
+
+    :param request: The request sent by the user
+    :param username: The username to retrieve messages for
+    :return:
+    """
+    try:
+        user = User.objects.get(username=username)
+        userMessages = Message.objects.filter(user=user).values('message_text', 'created', 'user')
+        return JsonResponse(list(userMessages), safe=False)
+
+    except (ObjectDoesNotExist, FieldDoesNotExist):
+        messages.error(request, 'The requested user was not found', extra_tags='danger')
         return HttpResponseRedirect(reverse('base:home'))

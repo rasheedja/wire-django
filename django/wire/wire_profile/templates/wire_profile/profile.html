@@ -2,6 +2,17 @@
 
 {% load django_bootstrap_breadcrumbs %}
 {% load bootstrap3 %}
+{% load static %}
+
+{% block stylesheets %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'profile/profile.css' %}" />
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'profile/profile.js'%}"></script>
+{% endblock %}
 
 {% block breadcrumbs %}
     {{ block.super }}
@@ -37,43 +48,57 @@
         {% endif %}
         <div class="container">
             <div class="row">
-                <div class="col-sm-2 user-info">
-                    <h3>{{user.username}}'s Page</h3>
-                    {% if is_current_user %}
-                        <button class="btn btn-primary create-wire" type="button" data-toggle="modal" data-target="#create-wire-modal">New Wire</button>
-                    {% endif %}
-                </div>
-                <div class="col-sm-7 user-wires">
+                <div class="col-sm-3 user-info">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <h3>Wires</h3>
+                            <h3>{{user.username}}'s Page</h3>
+                            {% if is_current_user %}
+                                <button class="btn btn-primary create-wire" type="button" data-toggle="modal" data-target="#create-wire-modal">New Wire</button>
+                            {% endif %}
                         </li>
-                        {% if messages is None %}
-                            <li class="list-group-item">
-                                This user has not created any wires
-                            </li>
-                        {% else %}
-                            {% for message in user_messages %}
-                                <li class="list-group-item">
-                                    {{ message.message_text }}
-                                </li>
-                            {% endfor %}
-                        {% endif %}
+                    </ul>
+                    <ul id="following" class="list-group">
+                        <li id="following-header" class="list-group-item">
+                            <h3>Following</h3>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="loader"></div>
+                        </li>
+                    </ul>
+                    <ul id="followers" class="list-group">
+                        <li id="followers-header" class="list-group-item">
+                            <h3>Followers</h3>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="loader"></div>
+                        </li>
                     </ul>
                 </div>
-                <div class="col-sm-3 wire-recommends">
+                <div class="col-sm-6 user-wires">
+                    <ul id="messages-list" class="list-group">
+                        <li id="messages-header" class="list-group-item">
+                            <h3>Wires</h3>
+                        </li>
+                        <li class="list-group-item loader-container">
+                            <div class="loader"></div>
+                        </li>
+                    </ul>
+                </div>
+                <div id="recommended-users" class="col-sm-3">
                     <ul class="list-group">
-                        <li class="list-group-item">
-                            <h3>Recommendations</h3>
+                        <li id="recommended-users-header" class="list-group-item">
+                            <h3>Other Users</h3>
                         </li>
                         <li class="list-group-item">
-                            <span>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                            </span>
+                            <div class="loader"></div>
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
     </main>
+
+    <script type="text/javascript">
+        var jsUsername = '{{ user.username }}';
+    </script>
 {% endblock %}
