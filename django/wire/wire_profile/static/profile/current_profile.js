@@ -1,45 +1,68 @@
 $(document).ready(function() {
-
     /*
     Formats each message into HTML to be shown on the frontend and then displays the message.
 
     @param message:           The contents of the message
     @param messageDateString: Date and time as a string
     */
-    function formatMessage(message, messageDateString) {
+    function formatMessage(message, messageDateString, userId) {
         var formattedMessage = createLinksForHashtags(message);
         var messagesList = $("#messages-list");
         var messagesHtml = "<li class='list-group-item'>";
         messagesHtml += "<h4 class='list-group-item-heading'>" + formattedMessage + "</h4>";
         messagesHtml += "<p class='list-group-item-text'>";
-        messagesHtml += "Posted on " + messageDateString;
+        messagesHtml += "Posted by <a class='user-id-" + userId + " href='/profile/id/" + userId + "/'>...</a>";
+        messagesHtml += " on " + messageDateString;
         messagesHtml += "</p>";
         messagesHtml += "</li>";
 
-        $('.user-wires .loader-container').remove()
+        populateUserIdProfileLink(userId);
+        $('.user-wires .loader-container').remove();
         messagesList.append(messagesHtml);
     }
 
-    // Load all messages posted by followers using AJAX
-    function loadMessages() {
+
+    /*
+    Populates the profile link for the given user id with the user's username
+
+    @param userId:            The Id of the user to populate the link for
+    */
+    function populateUserIdProfileLink(userId) {
         $.ajax(
             {
-                url: "/message/".concat(jsUsername),
+                url: "/user/id/" + userId,
+                type: "GET",
+                success: function (result) {
+                    $('a.user-id-' + userId).text(result[0].username);
+                }
+            }
+        )
+    }
+
+    /*
+    Load messages posted by the specified user ids
+     */
+    function loadMessages(userIds) {
+        var messagesHtml = "";
+        $.ajax(
+            {
+                url: "/messages/" + userIds.join('/') + "/",
                 type: "GET",
                 success: function (result) {
                     var messagesHeader = $("#messages-header");
-                    // Display a message if the user has not posted any messages
+                    // Display a message if no one has posted any messages
                     if (result.length === 0) {
                         messagesHeader.nextAll('li').remove();
-                        messagesHeader.after("<li class='list-group-item'>This user has not created any wires</li>");
+                        messagesHeader.after("<li class='list-group-item'>There are no messages posted by users you follow</li>")
                     } else {
+                        messagesHeader.nextAll('li').remove();
                         // Display messages if we received a result from the server
                         $.each(result, function(index, messageObject) {
                             // Format the date from the message to
                             var messageDate = new Date(messageObject.created);
                             var messageDateString = formatTimeStamp(messageDate);
 
-                            formatMessage(messageObject.message_text, messageDateString, messageObject.user);
+                            formatMessage(messageObject.message_text, messageDateString, messageObject.user)
                         });
                     }
                 }
@@ -62,7 +85,7 @@ $(document).ready(function() {
                     var recommendedUsersHeader = $("#recommended-users-header");
 
                     result.forEach(function(userObject) {
-                        usersHTML += formatUserList(userObject.username, "visit");
+                        usersHTML += formatUserList(userObject.username, "follow");
                     });
 
                     if (usersHTML === "") {
@@ -73,6 +96,25 @@ $(document).ready(function() {
 
                     recommendedUsersHeader.nextAll('li').remove();
                     recommendedUsersHeader.after(usersHTML);
+
+                    $('.follow-button').click(function() {
+                        var element = this;
+                        var username = element.id.split('-')[1];
+
+                        $.ajax(
+                            {
+                                url: "/follow/" + username + "/",
+                                types: "GET",
+                                success: function (result) {
+                                    element.classList.add('btn-success');
+                                    element.classList.add('disabled');
+                                    element.innerHTML = '<span class="glyphicon glyphicon-ok-circle"></span>';
+                                    loadRecommendedUsers();
+                                    loadFollows();
+                                }
+                            }
+                        )
+                    })
                 }
             }
         )
@@ -89,7 +131,7 @@ $(document).ready(function() {
                 type: "GET",
                 success: function (result) {
                     if (!result.success && result.success !== undefined) {
-                        console.log(result.message);
+                        console.log(result.message)
                     } else {
                         var usersHTML = "";
                         var followingHeader = $("#following-header");
@@ -101,17 +143,40 @@ $(document).ready(function() {
                                 followingUserIds.push(followInfo.following_id);
                             });
 
+                            loadMessages(followingUserIds);
+
                             $.ajax(
                                 {
                                     url: "/users/" + followingUserIds.join('/') + "/",
                                     type: "GET",
                                     success: function (result) {
-                                        result.forEach(function (userObject) {
-                                            usersHTML += formatUserList(userObject.username, "visit");
+                                        result.forEach(function(userObject) {
+                                            usersHTML += formatUserList(userObject.username, "unfollow", "danger");
                                         });
 
                                         followingHeader.nextAll('li').remove();
                                         followingHeader.after(usersHTML);
+
+                                        $('.unfollow-button').click(function() {
+                                            var element = this;
+                                            var username = element.id.split('-')[1];
+
+                                            $.ajax(
+                                                {
+                                                    url: "/follow/" + username + "/",
+                                                    types: "GET",
+                                                    success: function (result) {
+                                                        console.log(result);
+                                                        console.log(element);
+                                                        element.classList.add('btn-success');
+                                                        element.classList.add('disabled');
+                                                        element.innerHTML = '<span class="glyphicon glyphicon-ok-circle"></span>'
+                                                        loadRecommendedUsers();
+                                                        loadFollows();
+                                                    }
+                                                }
+                                            )
+                                        })
                                     }
                                 }
                             )
@@ -139,7 +204,7 @@ $(document).ready(function() {
                 type: "GET",
                 success: function (result) {
                     if (!result.success && result.success !== undefined) {
-                        console.log(result.message);
+                        console.log(result.message)
                     } else {
                         var followersHeader = $("#followers-header");
                         var usersHTML = "";
@@ -179,7 +244,6 @@ $(document).ready(function() {
         )
     }
 
-    loadMessages();
     loadRecommendedUsers();
     loadFollows();
     loadFollowers();

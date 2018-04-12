@@ -38,7 +38,7 @@ function formatUserList(username, buttonName, buttonType = 'default') {
     var userHTML = "";
 
     userHTML += "<li class='list-group-item clearfix'>";
-    userHTML += "<span><a href='/profile?username=" + username + "'>" + username + "</a></span>";
+    userHTML += "<span><a href='/profile/" + username + "/'>" + username + "</a></span>";
     if (buttonName !== 'visit') {
         userHTML += "<span class='pull-right'><a href='#' id='" + buttonName + "-" + username + "' class='btn btn-" + buttonType + " " + buttonName + "-button'>" + buttonName + "</a></span>";
     }

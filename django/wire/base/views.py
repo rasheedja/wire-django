@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist, FieldDoesNotExist
 from django.core.validators import validate_email
 from django.core.exceptions import  ValidationError
+from wire_profile.models import Follow
 
 
 def register(request):
@@ -106,6 +107,7 @@ def log_out(request):
     messages.success(request, 'You have logged out successfully')
     return HttpResponseRedirect(reverse('base:home'))
 
+
 def recommended_users(request, excluded_username):
     """
     Return five users that is not the logged in user, anyone followed by the logged in user, or the specified excluded
@@ -113,15 +115,16 @@ def recommended_users(request, excluded_username):
 
     :param request: The request that called this function
     :param excluded_username: A user not to include in the list
-    :return:
+    :return: JSON list of users
     """
     try:
         if request.user.is_authenticated:
+            follow_query = Follow.objects.filter(follower_id=request.user)
             users = User.objects.filter().exclude(id=request.user.id).exclude(username=excluded_username)\
-                .values('username')
+                .exclude(followed_user__in=follow_query).values('username')
             return JsonResponse(list(users), safe=False)
 
-        users = User.objects.filter().exclude(username=excluded_username).values('username')
+        users = User.objects.filter().exclude(username=excluded_username).values('username')[:5]
         return JsonResponse(list(users), safe=False)
 
     except (ObjectDoesNotExist, FieldDoesNotExist):
