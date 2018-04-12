@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'django_bootstrap_breadcrumbs',
-    'polls.apps.PollsConfig',
     'base.apps.BaseConfig',
     'wire_profile.apps.WireProfileConfig',
 ]
