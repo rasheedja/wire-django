@@ -1,0 +1,29 @@
+{% extends "base/global/base.html" %}
+
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Search" "wire_profile:search" %}
+{% endblock %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <form id="search-form" class="inline form-horizontal" role=form method=post action="/search">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

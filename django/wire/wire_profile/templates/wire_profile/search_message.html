@@ -1,0 +1,46 @@
+{% extends "base/global/base.html" %}
+
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Search" "wire_profile:search" %}
+    {% breadcrumb "Search Message" "wire_profile:search_message" %}
+{% endblock %}
+
+{% block title %}
+    Wire Search Results
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>Search Results</h1>
+                {% if search_results %}
+                    <h3>
+                        Wires Found
+                    </h3>
+                    <ul class="list-group message-list">
+                        {% for result in search_results %}
+                            <li class="list-group-item">
+                                <h4 class="list-group-item-heading">
+                                    {{ result.message_text }}
+                                </h4>
+                                <p class="list-group-item-text">
+                                    Posted on {{ result.created }} by <a href="{% url 'wire_profile:profile' username=result.user.username %}">{{result.user.username}}</a>
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <h3>No message containing {{query}} found</h3>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

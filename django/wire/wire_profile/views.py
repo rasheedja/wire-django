@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.db import DatabaseError
 from django.db.models import ObjectDoesNotExist, FieldDoesNotExist
 from django.core import serializers
-from .forms import NewWireForm
+from .forms import NewWireForm, SearchForm
 from .models import Message, Follow
 
 # Create your views here.
@@ -20,8 +20,7 @@ class ProfileView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         """
-        Get the current profile if the user is logged in. Show the search
-        page if the user is not logged in.
+        Get the profile page of the given user. Show the search page if the user was not found
 
         :param request: The current request
         :param args: sent to parent method
@@ -40,7 +39,8 @@ class ProfileView(TemplateView):
 
         except (ObjectDoesNotExist, FieldDoesNotExist):
             messages.error(request, 'The requested user was not found', extra_tags='danger')
-            return HttpResponseRedirect(reverse('base:home'))
+            url = reverse('wire_profile:search_user', kwargs={'query': username})
+            return HttpResponseRedirect(url)
 
 
 class CurrentProfileView(TemplateView):
@@ -48,8 +48,7 @@ class CurrentProfileView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         """
-        Get the current profile if the user is logged in. Show the search
-        page if the user is not logged in.
+        Get the current profile if the user is logged in.
 
         :param request: The current request
         :param args: sent to parent method
@@ -68,6 +67,75 @@ class CurrentProfileView(TemplateView):
         else:
             messages.error(request, 'You must log in to view your profile page', extra_tags='danger')
             return HttpResponseRedirect(reverse('base:home'))
+
+
+class SearchView(TemplateView):
+    template_name = 'wire_profile/search.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Render the search page
+
+        :param request: The current request
+        :param args: sent to parent method
+        :param kwargs: sent to parent method
+        :return: Render the search page
+        """
+        context = self.get_context_data(**kwargs)
+        context['form'] = SearchForm()
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['is_wire_search'] == 'true':
+                url = reverse('wire_profile:search_message', kwargs={'query': form.cleaned_data['search_query']})
+                return HttpResponseRedirect(url)
+            else:
+                url = reverse('wire_profile:search_user', kwargs={'query': form.cleaned_data['search_query']})
+                return HttpResponseRedirect(url)
+        else:
+            messages.error(request, 'Please complete the search form', extra_tags='danger')
+            return HttpResponseRedirect(reverse('wire_profile:search'))
+
+
+
+class SearchMessageView(TemplateView):
+    template_name = 'wire_profile/search_message.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Render the matching messages for a search message query
+
+        :param request: The current request
+        :param args: sent to parent method
+        :param kwargs: sent to parent method
+        :return: Render the search message results page
+        """
+        query = self.kwargs['query']
+        search_results = Message.objects.filter(message_text__icontains=query).all()
+        context = self.get_context_data(**kwargs)
+        context['search_results'] = search_results
+        return self.render_to_response(context)
+
+
+class SearchUserView(TemplateView):
+    template_name = 'wire_profile/search_user.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Render the matching messages for a search message query
+
+        :param request: The current request
+        :param args: sent to parent method
+        :param kwargs: sent to parent method
+        :return: Render the search message results page
+        """
+        query = self.kwargs['query']
+        search_results = User.objects.filter(username__icontains=query).all()
+        context = self.get_context_data(**kwargs)
+        context['search_results'] = search_results
+        return self.render_to_response(context)
 
 
 def create_message(request):
@@ -136,7 +204,6 @@ def get_messages_by_ids(request, user_ids):
     except (ObjectDoesNotExist, FieldDoesNotExist):
         messages.error(request, 'The requested users were not found', extra_tags='danger')
         return HttpResponseRedirect(reverse('base:home'))
-
 
 
 def follow_user(request, username):

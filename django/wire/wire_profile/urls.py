@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 from django.views.generic import TemplateView
-from .views import ProfileView, CurrentProfileView
+from .views import ProfileView, CurrentProfileView, SearchView, SearchMessageView, SearchUserView
 
 app_name = 'wire_profile'
 urlpatterns = [
@@ -15,5 +15,8 @@ urlpatterns = [
     path('followers/<path:username>', views.get_followers, name='follow_user'),
     path('following/<path:username>', views.get_following, name='follow_user'),
     path('users/<path:user_ids>', views.get_user_ids, name='get_user_ids'),
-    path('user/id/<int:user_id>', views.get_user_id, name='get_user_ids')
+    path('user/id/<int:user_id>', views.get_user_id, name='get_user_ids'),
+    path('search', SearchView.as_view(), name='search'),
+    path('search/wire/<path:query>', SearchMessageView.as_view(), name='search_message'),
+    path('search/user/<path:query>', SearchUserView.as_view(), name='search_user'),
 ]

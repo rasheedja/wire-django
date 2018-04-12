@@ -11,7 +11,7 @@ $(document).ready(function() {
         var messagesHtml = "<li class='list-group-item'>";
         messagesHtml += "<h4 class='list-group-item-heading'>" + formattedMessage + "</h4>";
         messagesHtml += "<p class='list-group-item-text'>";
-        messagesHtml += "Posted by <a class='user-id-" + userId + " href='/profile/id/" + userId + "/'>...</a>";
+        messagesHtml += "Posted by <a class='user-id-" + userId + " href=#'>...</a>";
         messagesHtml += " on " + messageDateString;
         messagesHtml += "</p>";
         messagesHtml += "</li>";
@@ -33,7 +33,9 @@ $(document).ready(function() {
                 url: "/user/id/" + userId,
                 type: "GET",
                 success: function (result) {
-                    $('a.user-id-' + userId).text(result[0].username);
+                    let matchingLink = $('a.user-id-' + userId);
+                    matchingLink.text(result[0].username);
+                    matchingLink.attr('href', '/profile/' + result[0].username);
                 }
             }
         )

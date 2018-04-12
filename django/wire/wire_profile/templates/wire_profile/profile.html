@@ -16,7 +16,11 @@
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Profile" "base:profile" %}
+    {% breadcrumb "Profile" "wire_profile:profile" %}
+{% endblock %}
+
+{% block title %}
+    {{ user.username }}'s Profile
 {% endblock %}
 
 {% block content %}

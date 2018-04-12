@@ -30,6 +30,7 @@
 
                     {% url 'base:home' as home %}
                     {% url 'wire_profile:current_profile' as profile %}
+                    {% url 'wire_profile:search' as search %}
                     {% url 'base:logout' as logout %}
                     {% url 'base:login' as login %}
                     {% url 'base:signup' as signup %}
@@ -42,6 +43,9 @@
                                 <a href="{{ profile }}">Profile</a>
                             </li>
                         {% endif %}
+                        <li class="nav-item{% if request.path == search %} active{%endif%}">
+                            <a href="{{ search }}">Search</a>
+                        </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_authenticated %}
