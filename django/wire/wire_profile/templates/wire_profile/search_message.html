@@ -31,7 +31,7 @@
                                     {{ result.message_text }}
                                 </h4>
                                 <p class="list-group-item-text">
-                                    Posted on {{ result.created }} by <a href="{% url 'wire_profile:profile' username=result.user.username %}">{{result.user.username}}</a>
+                                    Posted on {{ result.created|date:"d/m/Y  G:i" }} at {{ result.created|date:"G:i" }} by <a href="{% url 'wire_profile:profile' username=result.user.username %}">{{result.user.username}}</a>
                                 </p>
                             </li>
                         {% endfor %}

@@ -2,10 +2,11 @@ from django.urls import path
 
 from . import views
 from django.views.generic import TemplateView
+from .views import HomeView
 
 app_name = 'base'
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='base/index.html'), name='home'),
+    path('', HomeView.as_view(), name='home'),
     path('login', TemplateView.as_view(template_name='base/login.html'), name='login'),
     path('signup', TemplateView.as_view(template_name='base/signup.html'), name='signup'),
     path('register', views.register, name='register'),

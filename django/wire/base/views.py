@@ -9,7 +9,29 @@ from django.db import IntegrityError
 from django.db.models import ObjectDoesNotExist, FieldDoesNotExist
 from django.core.validators import validate_email
 from django.core.exceptions import  ValidationError
-from wire_profile.models import Follow
+from wire_profile.models import Follow, Message
+
+
+class HomeView(TemplateView):
+    template_name = 'base/index.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Render the home page, ensuring latest messages and tagged messages are available for use in the template
+
+        :param request: The current request
+        :param args: sent to parent method
+        :param kwargs: sent to parent method
+        :return: Render the search message results page
+        """
+
+        latest_messages = Message.objects.order_by('-created').all()[:5]
+        latest_tagged_messages = Message.objects.filter(message_text__icontains=' #').order_by('-created').all()[:5]
+
+        context = self.get_context_data(**kwargs)
+        context['latest_messages'] = latest_messages
+        context['latest_tagged_messages'] = latest_tagged_messages
+        return self.render_to_response(context)
 
 
 def register(request):

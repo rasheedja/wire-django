@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.test import TransactionTestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from wire_profile.models import Follow
+from django.utils import timezone
+from wire_profile.models import Follow, Message
 
 
 class RegisterViewTests(TransactionTestCase):
@@ -412,3 +413,129 @@ class RecommendedUsersViewTest(TestCase):
         self.assertNotIn('test5', response_content)
         self.assertNotIn('test6', response_content)
         self.assertNotIn('test7', response_content)
+
+
+class HomeViewTest(TestCase):
+    def test_correct_template_loaded(self):
+        response = self.client.get(reverse('base:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('base/index.html')
+
+    def test_five_latest_normal_messages_loaded(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+
+        Message.objects.create(message_text='foo', created=timezone.now(), user=user)
+        Message.objects.create(message_text='bar', created=timezone.now(), user=user)
+        Message.objects.create(message_text='baz', created=timezone.now(), user=user)
+        Message.objects.create(message_text='bam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='fam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='tam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='lam', created=timezone.now(), user=user)
+
+        response = self.client.get(reverse('base:home'))
+        latest_messages = response.context['latest_messages']
+        messages = [message.message_text for message in latest_messages]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(messages), 5)
+        self.assertNotIn('foo', messages)
+        self.assertNotIn('bar', messages)
+        self.assertIn('baz', messages)
+        self.assertIn('bam', messages)
+        self.assertIn('fam', messages)
+        self.assertIn('tam', messages)
+        self.assertIn('lam', messages)
+
+    def test_five_latest_tagged_messages_loaded(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+
+        Message.objects.create(message_text='hello #foo', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #bar', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #baz', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #bam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #fam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #tam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #lam', created=timezone.now(), user=user)
+
+        response = self.client.get(reverse('base:home'))
+        latest_tagged_messages = response.context['latest_tagged_messages']
+        messages = [message.message_text for message in latest_tagged_messages]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(messages), 5)
+        self.assertNotIn('hello #foo', messages)
+        self.assertNotIn('hello #bar', messages)
+        self.assertIn('hello #baz', messages)
+        self.assertIn('hello #bam', messages)
+        self.assertIn('hello #fam', messages)
+        self.assertIn('hello #tam', messages)
+        self.assertIn('hello #lam', messages)
+
+    def test_one_normal_message_and_one_tagged_message_loaded(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+
+        Message.objects.create(message_text='hello foo', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #bar', created=timezone.now(), user=user)
+
+        response = self.client.get(reverse('base:home'))
+        latest_messages = response.context['latest_messages']
+        l_messages = [message.message_text for message in latest_messages]
+        latest_tagged_messages = response.context['latest_tagged_messages']
+        l_t_messages = [message.message_text for message in latest_tagged_messages]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(l_messages), 2)
+        self.assertEqual(len(l_t_messages), 1)
+        self.assertIn('hello foo', l_messages)
+        self.assertIn('hello #bar', l_messages)
+        self.assertIn('hello #bar', l_t_messages)
+        self.assertNotIn('foo', l_t_messages)
+
+    def test_five_normal_messages_and_five_tagged_messages_loaded(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+
+        Message.objects.create(message_text='hello #foo', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #bar', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #baz', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #bam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='spam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='flam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='clam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #fam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #tam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='hello #lam', created=timezone.now(), user=user)
+        Message.objects.create(message_text='slam', created=timezone.now(), user=user)
+
+        response = self.client.get(reverse('base:home'))
+        latest_messages = response.context['latest_messages']
+        l_messages = [message.message_text for message in latest_messages]
+        latest_tagged_messages = response.context['latest_tagged_messages']
+        l_t_messages = [message.message_text for message in latest_tagged_messages]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(l_messages), 5)
+        self.assertEqual(len(l_t_messages), 5)
+
+        self.assertNotIn('hello #foo', l_messages)
+        self.assertNotIn('hello #bar', l_messages)
+        self.assertNotIn('hello #baz', l_messages)
+        self.assertNotIn('hello #bam', l_messages)
+        self.assertNotIn('spam', l_messages)
+        self.assertNotIn('flam', l_messages)
+        self.assertIn('clam', l_messages)
+        self.assertIn('hello #fam', l_messages)
+        self.assertIn('hello #tam', l_messages)
+        self.assertIn('hello #lam', l_messages)
+        self.assertIn('slam', l_messages)
+
+        self.assertNotIn('hello #foo', l_t_messages)
+        self.assertNotIn('hello #bar', l_t_messages)
+        self.assertNotIn('spam', l_t_messages)
+        self.assertNotIn('flam', l_t_messages)
+        self.assertNotIn('clam', l_t_messages)
+        self.assertNotIn('slam', l_t_messages)
+        self.assertIn('hello #baz', l_t_messages)
+        self.assertIn('hello #bam', l_t_messages)
+        self.assertIn('hello #fam', l_t_messages)
+        self.assertIn('hello #tam', l_t_messages)
+        self.assertIn('hello #lam', l_t_messages)
