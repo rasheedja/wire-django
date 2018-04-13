@@ -121,7 +121,7 @@ def recommended_users(request, excluded_username):
         if request.user.is_authenticated:
             follow_query = Follow.objects.filter(follower_id=request.user)
             users = User.objects.filter().exclude(id=request.user.id).exclude(username=excluded_username)\
-                .exclude(followed_user__in=follow_query).values('username')
+                .exclude(followed_user__in=follow_query).values('username')[:5]
             return JsonResponse(list(users), safe=False)
 
         users = User.objects.filter().exclude(username=excluded_username).values('username')[:5]

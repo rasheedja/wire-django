@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.test import TransactionTestCase
 from django.urls import reverse
+from django.contrib.auth.models import User
+from wire_profile.models import Follow
 
 
 class RegisterViewTests(TransactionTestCase):
@@ -184,10 +186,6 @@ class VerifyUserViewTests(TestCase):
         """
         Log in to an account with a username that is 150 characters long, the max length allowed. This should pass.
         """
-        """
-        Try to create an account with a username that is 150 characters long, the max length for a username.
-        The account should be created successfully
-        """
         username = 'AnWwD0jq7MnVUMaZOFBK8NYfdMXGLAplAUQUgy4Pp1ZCpSdlG25o259RghvLfwvbljbhfOK54ezspwOR8iB6Bh8rX60lHPfEjr5lScqfMJpUEhCq61QjRKnOAD77m0GsffeMK1gCHDA8g392sJHLtF'
         self.client.post(reverse('base:register'), {'username': username, 'password': 'test', 'email': 'test@test.com'})
         response = self.client.post(reverse('base:verify'), {'username': username, 'password': 'test'}, follow=True)
@@ -256,3 +254,161 @@ class LogOutViewTest(TestCase):
         message = list(response.context.get('messages'))[2]
         self.assertEqual(message.tags, 'success')
         self.assertEqual(str(message), 'You have logged out successfully')
+
+
+class RecommendedUsersViewTest(TestCase):
+    def test_get_recommended_users_while_logged_in(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+        User.objects.create_user('test2', 'test2@test.com', 'test')
+        User.objects.create_user('test3', 'test3@test.com', 'test')
+
+        self.client.post(reverse('base:verify'), {'username': user.username, 'password': 'test'})
+        url = reverse('base:recommended_users', kwargs={'excluded_username': user.username})
+
+        response = self.client.get(url)
+        response_content = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('testfoo', response_content)
+        self.assertIn('test2', response_content)
+        self.assertIn('test3', response_content)
+
+    def test_get_recommended_users_while_logged_in_and_excluding_another_user(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+        user2 = User.objects.create_user('test2', 'test2@test.com', 'test')
+        User.objects.create_user('test3', 'test3@test.com', 'test')
+        User.objects.create_user('test4', 'test4@test.com', 'test')
+        User.objects.create_user('test5', 'test5@test.com', 'test')
+
+        self.client.post(reverse('base:verify'), {'username': user.username, 'password': 'test'})
+        url = reverse('base:recommended_users', kwargs={'excluded_username': user2.username})
+
+        response = self.client.get(url)
+        response_content = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('testfoo', response_content)
+        self.assertNotIn('test2', response_content)
+        self.assertIn('test3', response_content)
+
+    def test_get_maximum_of_five_recommended_users(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+        User.objects.create_user('test2', 'test2@test.com', 'test')
+        User.objects.create_user('test3', 'test3@test.com', 'test')
+        User.objects.create_user('test4', 'test4@test.com', 'test')
+        User.objects.create_user('test5', 'test5@test.com', 'test')
+        User.objects.create_user('test6', 'test6@test.com', 'test')
+        User.objects.create_user('test7', 'test7@test.com', 'test')
+
+        self.client.post(reverse('base:verify'), {'username': user.username, 'password': 'test'})
+        url = reverse('base:recommended_users', kwargs={'excluded_username': user.username})
+
+        response = self.client.get(url)
+        response_content = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('testfoo', response_content)
+        self.assertIn('test2', response_content)
+        self.assertIn('test3', response_content)
+        self.assertIn('test4', response_content)
+        self.assertIn('test5', response_content)
+        self.assertIn('test6', response_content)
+        self.assertNotIn('test7', response_content)
+
+    def test_exclusing_of_one_followed_user(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+        user2 = User.objects.create_user('test2', 'test2@test.com', 'test')
+        User.objects.create_user('test3', 'test3@test.com', 'test')
+        User.objects.create_user('test4', 'test4@test.com', 'test')
+        User.objects.create_user('test5', 'test5@test.com', 'test')
+        User.objects.create_user('test6', 'test6@test.com', 'test')
+        User.objects.create_user('test7', 'test7@test.com', 'test')
+        User.objects.create_user('test8', 'test8@test.com', 'test')
+
+        Follow.objects.create(follower_id=user, following_id=user2)
+
+        self.client.post(reverse('base:verify'), {'username': user.username, 'password': 'test'})
+        url = reverse('base:recommended_users', kwargs={'excluded_username': user.username})
+
+        response = self.client.get(url)
+        response_content = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('testfoo', response_content)
+        self.assertNotIn('test2', response_content)
+        self.assertIn('test3', response_content)
+        self.assertIn('test4', response_content)
+        self.assertIn('test5', response_content)
+        self.assertIn('test6', response_content)
+        self.assertIn('test7', response_content)
+        self.assertNotIn('test8', response_content)
+
+    def test_exclusion_of_multiple_followed_users(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+        user2 = User.objects.create_user('test2', 'test2@test.com', 'test')
+        user3 = User.objects.create_user('test3', 'test3@test.com', 'test')
+        user4 = User.objects.create_user('test4', 'test4@test.com', 'test')
+        User.objects.create_user('test5', 'test5@test.com', 'test')
+        User.objects.create_user('test6', 'test6@test.com', 'test')
+        User.objects.create_user('test7', 'test7@test.com', 'test')
+        User.objects.create_user('test8', 'test8@test.com', 'test')
+        User.objects.create_user('test9', 'test9@test.com', 'test')
+        User.objects.create_user('test10', 'test10@test.com', 'test')
+
+        Follow.objects.create(follower_id=user, following_id=user2)
+        Follow.objects.create(follower_id=user, following_id=user3)
+        Follow.objects.create(follower_id=user, following_id=user4)
+
+        self.client.post(reverse('base:verify'), {'username': user.username, 'password': 'test'})
+        url = reverse('base:recommended_users', kwargs={'excluded_username': user.username})
+
+        response = self.client.get(url)
+        response_content = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('testfoo', response_content)
+        self.assertNotIn('test2', response_content)
+        self.assertNotIn('test3', response_content)
+        self.assertNotIn('test4', response_content)
+        self.assertIn('test5', response_content)
+        self.assertIn('test6', response_content)
+        self.assertIn('test7', response_content)
+        self.assertIn('test8', response_content)
+        self.assertIn('test9', response_content)
+        self.assertNotIn('test10', response_content)
+
+    def test_response_when_no_other_users(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+
+        self.client.post(reverse('base:verify'), {'username': user.username, 'password': 'test'})
+        url = reverse('base:recommended_users', kwargs={'excluded_username': user.username})
+
+        response = self.client.get(url)
+        response_content = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('testfoo', response_content)
+
+    def test_response_when_every_user_is_being_followed(self):
+        user = User.objects.create_user('testfoo', 'test@test.com', 'test')
+        user2 = User.objects.create_user('test2', 'test2@test.com', 'test')
+        user3 = User.objects.create_user('test3', 'test3@test.com', 'test')
+        user4 = User.objects.create_user('test4', 'test4@test.com', 'test')
+        user5 = User.objects.create_user('test5', 'test5@test.com', 'test')
+        user6 = User.objects.create_user('test6', 'test6@test.com', 'test')
+        user7 = User.objects.create_user('test7', 'test7@test.com', 'test')
+
+        Follow.objects.create(follower_id=user, following_id=user2)
+        Follow.objects.create(follower_id=user, following_id=user3)
+        Follow.objects.create(follower_id=user, following_id=user4)
+        Follow.objects.create(follower_id=user, following_id=user5)
+        Follow.objects.create(follower_id=user, following_id=user6)
+        Follow.objects.create(follower_id=user, following_id=user7)
+
+        self.client.post(reverse('base:verify'), {'username': user.username, 'password': 'test'})
+        url = reverse('base:recommended_users', kwargs={'excluded_username': user.username})
+
+        response = self.client.get(url)
+        response_content = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('testfoo', response_content)
+        self.assertNotIn('test2', response_content)
+        self.assertNotIn('test3', response_content)
+        self.assertNotIn('test4', response_content)
+        self.assertNotIn('test5', response_content)
+        self.assertNotIn('test6', response_content)
+        self.assertNotIn('test7', response_content)
