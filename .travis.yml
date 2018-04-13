@@ -1,0 +1,38 @@
+language: python
+
+python:
+  - "3.5"
+  - "3.6"
+
+# Django Versions to test against
+env:
+  - DJANGO_VERSION=2.0.4
+
+# Ensure necessary system libraries are present
+addons:
+  postgresql: "9.5"
+  apt:
+    packages:
+      - libgmp-dev
+
+# Start PostgreSQL
+services:
+  - postgresql
+
+before_script:
+  - psql -c "CREATE USER wire WITH PASSWORD 'wire'"
+  - psql -c "ALTER USER wire CREATEDB"
+  - psql -c "CREATE DATABASE django_wire OWNER wire"
+  - psql -c "CREATE DATABASE django_wire_test OWNER wire"
+
+before_install:
+  - cd django/wire
+
+install:
+  # Build dependencies
+  - pip install -q Django==$DJANGO_VERSION
+  - pip install psycopg2 django-bootstrap3
+
+script:
+  # Build the package, its tests, and its docs and run the tests
+  - python manage.py test
