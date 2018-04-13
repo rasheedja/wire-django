@@ -34,7 +34,6 @@ class ProfileView(TemplateView):
         try:
             user = User.objects.get(username=username)
             context['user'] = user
-            context['user_messages'] = Message.objects.filter(user=user)
             return self.render_to_response(context)
 
         except (ObjectDoesNotExist, FieldDoesNotExist):
@@ -58,11 +57,8 @@ class CurrentProfileView(TemplateView):
         if request.user.is_authenticated:
             context = self.get_context_data(**kwargs)
             form = NewWireForm()
-            context['is_current_user'] = False
             context['form'] = form
-            context['is_current_user'] = True
             context['user'] = request.user
-            context['user_messages'] = Message.objects.filter(user=request.user)
             return self.render_to_response(context)
         else:
             messages.error(request, 'You must log in to view your profile page', extra_tags='danger')
@@ -96,8 +92,9 @@ class SearchView(TemplateView):
                 return HttpResponseRedirect(url)
         else:
             messages.error(request, 'Please complete the search form', extra_tags='danger')
-            return HttpResponseRedirect(reverse('wire_profile:search'))
-
+            context = self.get_context_data(**kwargs)
+            context['form'] = SearchForm()
+            return self.render_to_response(context)
 
 
 class SearchMessageView(TemplateView):
@@ -202,7 +199,7 @@ def get_messages_by_ids(request, user_ids):
         return JsonResponse(list(user_messages), safe=False)
 
     except (ObjectDoesNotExist, FieldDoesNotExist):
-        messages.error(request, 'The requested users were not found', extra_tags='danger')
+        messages.error(request, 'Error retrieving messages, Please contact support', extra_tags='danger')
         return HttpResponseRedirect(reverse('base:home'))
 
 
@@ -245,7 +242,6 @@ def get_followers(request, username):
         followers = Follow.objects.filter(following_id=user).values('follower_id', 'following_id')
         return JsonResponse(list(followers), safe=False)
     except(ObjectDoesNotExist, FieldDoesNotExist):
-        messages.error(request, 'The given username was not found', extra_tags='danger')
         return JsonResponse({'success': False, 'message': 'The given username was not found'})
 
 
@@ -262,7 +258,6 @@ def get_following(request, username):
         followers = Follow.objects.filter(follower_id=user).values('follower_id', 'following_id')
         return JsonResponse(list(followers), safe=False)
     except(ObjectDoesNotExist, FieldDoesNotExist):
-        messages.error(request, 'The given username was not found', extra_tags='danger')
         return JsonResponse({'success': False, 'message': 'The given username was not found'})
 
 
@@ -288,6 +283,5 @@ def get_user_id(request, user_id):
     :param user_id: The user id
     :return: user in JSON format
     """
-    print(user_id)
     users = User.objects.filter(pk=user_id).values('username')
     return JsonResponse(list(users), safe=False)
