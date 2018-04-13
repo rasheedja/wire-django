@@ -31,7 +31,7 @@ before_install:
 install:
   # Build dependencies
   - pip install -q Django==$DJANGO_VERSION
-  - pip install psycopg2 django-bootstrap3
+  - pip install psycopg2 django-bootstrap3 django-bootstrap-breadcrumbs
 
 script:
   # Build the package, its tests, and its docs and run the tests
