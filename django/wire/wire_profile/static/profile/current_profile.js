@@ -4,6 +4,7 @@ $(document).ready(function() {
 
     @param message:           The contents of the message
     @param messageDateString: Date and time as a string
+    @param userId:            The Id of the user who posted the message
     */
     function formatMessage(message, messageDateString, userId) {
         var formattedMessage = createLinksForHashtags(message);
@@ -189,6 +190,10 @@ $(document).ready(function() {
 
                             followingHeader.nextAll('li').remove();
                             followingHeader.after(usersHTML);
+
+                            var messagesHeader = $("#messages-header");
+                            messagesHeader.nextAll('li').remove();
+                            messagesHeader.after("<li class='list-group-item'>There are no messages posted by users you follow</li>")
                         }
                     }
                 }

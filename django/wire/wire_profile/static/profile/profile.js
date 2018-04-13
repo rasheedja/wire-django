@@ -16,7 +16,7 @@ $(document).ready(function() {
         messagesHtml += "</p>";
         messagesHtml += "</li>";
 
-        $('.user-wires .loader-container').remove()
+        $('.user-wires .loader-container').remove();
         messagesList.append(messagesHtml);
     }
 
@@ -33,6 +33,7 @@ $(document).ready(function() {
                         messagesHeader.nextAll('li').remove();
                         messagesHeader.after("<li class='list-group-item'>This user has not created any wires</li>");
                     } else {
+                        messagesHeader.nextAll('li').remove();
                         // Display messages if we received a result from the server
                         $.each(result, function(index, messageObject) {
                             // Format the date from the message to
