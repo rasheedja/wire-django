@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.db import IntegrityError
+from django.db import IntegrityError, DatabaseError
 from django.db.models import ObjectDoesNotExist, FieldDoesNotExist
 from django.core.validators import validate_email
 from django.core.exceptions import  ValidationError
@@ -81,6 +81,9 @@ def register(request):
     except ValueError:
         messages.error(request, 'Please ensure you have entered a username, email, and password', extra_tags='danger')
         return HttpResponseRedirect(reverse('base:signup'))
+    except DatabaseError:
+        messages.error(request, 'Error creating message, please contact support', extra_tags='danger')
+        return HttpResponseRedirect(reverse('wire_profile:current_profile'))
 
     login(request, user)
     messages.success(request, 'Welcome to Wire, ' + user.username)

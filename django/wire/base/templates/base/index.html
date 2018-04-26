@@ -1,5 +1,12 @@
 {% extends "base/global/base.html" %}
 
+{% load static %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'base/home.js'%}"></script>
+{% endblock %}
+
 {% block content %}
     <header class="jumbotron jumbotron-fluid bg-dark text-light">
         <div class="container">
@@ -18,10 +25,11 @@
                                 {{ message.message_text }}
                             </h4>
                             <p class="list-group-item-text">
-                                Posted on {{ message.created|date:"d/m/Y" }} at {{ message.created|date:"G:i" }} by <a href="#">{{ message.user.username }}</a>
+                                Posted on {{ message.created|date:"d/m/Y" }} at {{ message.created|date:"G:i" }} by <a href="/profile/{{ message.user.username }}">{{ message.user.username }}</a>
                             </p>
                         </li>
                     {% endfor %}
+                    </ul>
                 </div>
                 <div class="col-sm-4">
                     <h1>Latest Tagged Wires</h1>
@@ -32,7 +40,7 @@
                                     {{ message.message_text }}
                                 </h4>
                                 <p class="list-group-item-text">
-                                    Posted on {{ message.created|date:"d/m/Y" }} at {{ message.created|date:"G:i" }} by <a href="#">{{ message.user.username }}</a>
+                                    Posted on {{ message.created|date:"d/m/Y" }} at {{ message.created|date:"G:i" }} by <a href="/profile/{{ message.user.username }}">{{ message.user.username }}</a>
                                 </p>
                             </li>
                         {% endfor %}
