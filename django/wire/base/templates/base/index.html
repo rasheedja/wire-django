@@ -28,6 +28,8 @@
                                 Posted on {{ message.created|date:"d/m/Y" }} at {{ message.created|date:"G:i" }} by <a href="/profile/{{ message.user.username }}">{{ message.user.username }}</a>
                             </p>
                         </li>
+                    {% empty %}
+                        <h3>No one has created a Wire yet</h3>
                     {% endfor %}
                     </ul>
                 </div>
@@ -43,6 +45,8 @@
                                     Posted on {{ message.created|date:"d/m/Y" }} at {{ message.created|date:"G:i" }} by <a href="/profile/{{ message.user.username }}">{{ message.user.username }}</a>
                                 </p>
                             </li>
+                        {% empty %}
+                            <h3>No one has created a Tagged Wire yet</h3>
                         {% endfor %}
                         </li>
                     </ul>
