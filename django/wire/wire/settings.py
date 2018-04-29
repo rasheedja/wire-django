@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'www.wire-django.com',
     'localhost',
+    'ec2-18-221-131-69.us-east-2.compute.amazonaws.com',
 ]
 
 
