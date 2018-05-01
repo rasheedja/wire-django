@@ -148,7 +148,7 @@ def create_message(request):
             if request.user.is_authenticated:
                 message = form.cleaned_data['message']
                 try:
-                    Message.objects.create(message_text=form, created=timezone.now(), user=request.user)
+                    Message.objects.create(message_text=message, created=timezone.now(), user=request.user)
                     messages.success(request, 'Message created successfully', extra_tags='success')
                     return HttpResponseRedirect(reverse('wire_profile:current_profile'))
                 except DatabaseError:
