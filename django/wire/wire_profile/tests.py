@@ -195,6 +195,7 @@ class CreateMessageTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(message.tags, 'success success')
         self.assertEqual(Message.objects.count(), 1)
+        self.assertEqual(Message.objects.first().message_text, 'test')
         self.assertEqual(str(message), 'Message created successfully')
 
 
