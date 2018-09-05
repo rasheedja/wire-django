@@ -1,5 +1,5 @@
 # Wire Django
-A website inspired by twitter made using Django. This website was made for a comparison between Yesod and Django. A write-up of this comparison can be found [here](https://github.com/rasheedja/YesodDjangoComparison)
+A website inspired by twitter made using Django. This website was made for a comparison between Yesod and Django. A write-up of this comparison can be found [here](https://github.com/rasheedja/YesodDjangoComparison).
 
 ## Prerequisites
 1. Vagrant >= 2.0 https://www.vagrantup.com/downloads.html
